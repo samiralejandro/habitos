@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa de Puntos - Cowboy Bebop</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 20px; 
+            background-color: #1c1c1c;
+            color: #ffffff;
+        }
+        header {
+            background: url('HiVaquero.png') no-repeat center;
+            background-size: cover;
+            height: 200px;
+        }
+        .week-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+        }
+        .day {
+            padding: 10px;
+            background: #ff4747;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .habits-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .habit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ff4747;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .progress-container { 
+            width: 80%; 
+            background: #ddd; 
+            border-radius: 5px; 
+            margin: 20px auto; 
+        }
+        .progress-bar { 
+            width: 0%; 
+            height: 20px; 
+            background: green; 
+            border-radius: 5px; 
+            transition: 0.5s; 
+        }
+        .reward { 
+            margin-top: 20px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: red; 
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+            background: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header></header>
+    <h1>See you space cowboy...</h1>
+    <div class="week-container">
+        <div class="day">Lun <span id="mondayPoints">0</span></div>
+        <div class="day">Mar <span id="tuesdayPoints">0</span></div>
+        <div class="day">Mié <span id="wednesdayPoints">0</span></div>
+        <div class="day">Jue <span id="thursdayPoints">0</span></div>
+        <div class="day">Vie <span id="fridayPoints">0</span></div>
+        <div class="day">Sáb <span id="saturdayPoints">0</span></div>
+        <div class="day">Dom <span id="sundayPoints">0</span></div>
+    </div>
+    <div class="habits-container">
+        <label class="habit"><input type="checkbox" onclick="addPoints(10)"> Ejercicio</label>
+        <label class="habit"><input type="checkbox" onclick="addPoints(8)"> Lectura</label>
+        <label class="habit"><input type="checkbox" onclick="addPoints(6)"> Ayuno Intermitente</label>
+        <label class="habit"><input type="checkbox" onclick="addPoints(10)"> Estudiar</label>
+        <label class="habit"><input type="checkbox" onclick="addPoints(5)"> Organizar cuarto</label>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p>Puntos Totales: <span id="points">0</span>/250</p>
+    <p class="reward" id="rewardMsg"></p>
+    
+    <button onclick="resetPoints()">Adelante, vaquero</button>
+
+    <script>
+        function resetWeekly() {
+            let lastReset = localStorage.getItem("lastReset");
+            let today = new Date();
+            let dayOfWeek = today.getDay();
+            
+            if (!lastReset || new Date(lastReset).getDay() !== 1) {
+                if (dayOfWeek === 1) { 
+                    localStorage.clear(); 
+                    localStorage.setItem("lastReset", today);
+                    location.reload();
+                }
+            }
+        }
+
+        function addPoints(value) {
+            let today = new Date().getDay();
+            let days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            let dayKey = days[today] + "Points";
+            let dayPoints = parseInt(localStorage.getItem(dayKey)) || 0;
+            dayPoints += value;
+            localStorage.setItem(dayKey, dayPoints);
+            document.getElementById(dayKey).textContent = dayPoints;
+            
+            let points = parseInt(localStorage.getItem("points")) || 0;
+            points += value;
+            localStorage.setItem("points", points);
+            document.getElementById("points").textContent = points;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let points = parseInt(localStorage.getItem("points")) || 0;
+            let progress = (points / 250) * 100;
+            document.getElementById("progressBar").style.width = progress + "%";
+            
+            if (points >= 250) {
+                document.getElementById("rewardMsg").textContent = "¡Puedes pecar este fin de semana! 🍻🍕";
+            }
+        }
+
+        function loadDayPoints() {
+            let days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+            days.forEach(day => {
+                let dayPoints = localStorage.getItem(day + "Points") || 0;
+                document.getElementById(day + "Points").textContent = dayPoints;
+            });
+        }
+
+        function resetPoints() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        resetWeekly();
+        loadDayPoints();
+        updateProgress();
+    </script>
+</body>
+</html>
